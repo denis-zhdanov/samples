@@ -16,3 +16,13 @@ try {
 } catch (e) {
   console.log("An error on gRPC initialization", e)
 }
+
+const client = new proto.sample.SampleService("localhost:50051", grpc.credentials.createInsecure());
+
+client.greet({name: "Jhon"}, (err, answer) => {
+  if (err) {
+    console.error("Error on calling the remote service: " + JSON.stringify(err));
+  } else {
+    console.log("Successfully called remote service: " + answer.message);
+  }
+});

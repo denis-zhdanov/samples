@@ -5,5 +5,4 @@ http.createServer(function (req, res) {
   res.end("Hello World\n");
 }).listen(50051);
 
-require("./src/grpc-server");
-require("./src/grpc-client");
+require("./src/grpc");

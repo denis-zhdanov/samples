@@ -1,0 +1,8 @@
+{
+  "name": "grpc-port-conflict",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "grpc": "~1.0.1"
+  }
+}

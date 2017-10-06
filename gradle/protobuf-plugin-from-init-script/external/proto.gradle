@@ -1,3 +1,7 @@
+// Note that a complete gradle wrapper with this init script is hosted in another
+// repo, namely, here - https://github.com/denis-zhdanov/big-files/blob/master/sample/gradle/protobuf-plugin-from-init-script/gradle-4.2.1-proto-all.zip.
+// It has current scipt at the 'init.d' directory at the target *.zip file.
+
 initscript {
 
     repositories {

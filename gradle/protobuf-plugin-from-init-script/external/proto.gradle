@@ -1,0 +1,81 @@
+initscript {
+
+    repositories {
+        jcenter()
+        mavenLocal()
+    }
+
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.0'
+    }
+}
+
+allprojects {
+
+    apply plugin: 'java'
+    apply plugin: 'maven-publish'
+    apply plugin: 'idea'
+
+    // This is a work around for the gradle bug when it's not possible to apply plugins by id
+    // in init scripts - https://github.com/gradle/gradle/issues/1322. However, it's possible to
+    // apply plugins by class name from init scripts.
+    // Here we get another problem - google 'protobuf' plugin explicitly makes the call below:
+    //     project.apply plugin: 'com.google.osdetector'
+    //     https://github.com/google/protobuf-gradle-plugin/blob/master/src/main/groovy/com/google/protobuf/gradle/ProtobufPlugin.groovy#L98
+    // So, we do the following to overcome that:
+    //   1. Explicitly apply 'osdetector' plugin by class name
+    //   2. Override 'apply' method on 'project' object in runtime in order to skip calls to apply
+    //      the 'osdetector' plugin by id
+    apply plugin: com.google.gradle.osdetector.OsDetectorPlugin
+    def originalApply = project.&apply
+    project.metaClass.apply = { LinkedHashMap args ->
+        if (args.entrySet().iterator().next().value != "com.google.osdetector") {
+            originalApply(args)
+        }
+    }
+
+    apply plugin: com.google.protobuf.gradle.ProtobufPlugin
+
+    repositories {
+        jcenter()
+        mavenLocal()
+    }
+
+    sourceSets.main.java.srcDirs buildDir.path + "/generated/source/proto/main/grpc/"
+    sourceSets.main.java.srcDirs buildDir.path + "/generated/source/proto/main/java/"
+
+    protobuf {
+        protoc {
+            artifact = 'com.google.protobuf:protoc:3.0.2'
+        }
+        plugins {
+            grpc {
+                artifact = "io.grpc:protoc-gen-grpc-java:1.0.1"
+            }
+        }
+        generateProtoTasks {
+            all()*.plugins {
+                grpc {
+                    option 'enable_deprecated=false'
+                }
+            }
+        }
+    }
+
+    idea {
+        module {
+            sourceDirs += file(protobuf.generatedFilesBaseDir + "/main/java")
+            sourceDirs += file(protobuf.generatedFilesBaseDir + "/main/grpc")
+        }
+    }
+
+    dependencies {
+        compile "io.grpc:grpc-protobuf:1.0.1"
+        compile "io.grpc:grpc-stub:1.0.1"
+        compile "io.grpc:grpc-netty:1.0.1"
+    }
+
+    group 'org.denis.sample'
+
+    sourceCompatibility = 1.8
+}

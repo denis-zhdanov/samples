@@ -1,0 +1,27 @@
+group 'org.denis.sample.spring.test'
+version '1.0.0'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.7.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.jetbrains:annotations:15.0'
+    compile("org.springframework.boot:spring-boot-starter")
+
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+}

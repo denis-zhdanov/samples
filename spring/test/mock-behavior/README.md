@@ -2,7 +2,7 @@ This is a sample project for the idea explained in [this blog post](http://denis
   
 It shows how to tweak *Spring*-managed beans behavior during tests execution. That allows to emulate race conditions in production code.
   
-We illustrated how to write a test which detects a race condition in the code below (a concurrent request might be executed between the calls to *cache.get()* and *cache.put()*):
+We illustrated how to write a test which detects the problem in the code below (a concurrent request might be executed between the calls to `cache.get()` and `cache.put()`):
 ```java
 @NotNull
 public Log store(@NotNull Log log) {

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">GrpcTest</string>
+    <string name="text_call_grpc">Call GRPC</string>
+</resources>

@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.test";
+option java_outer_classname = "TestProto";
+
+package v1;
+
+service RefreshService {
+    rpc refreshAll(RefreshAllRequest) returns (stream RefreshAllResponse) {}
+}
+
+message RefreshAllRequest {
+    string from = 1;
+}
+
+message RefreshAllResponse {
+    string payloda = 1;
+}

@@ -1,5 +1,6 @@
 plugins {
-    id 'me.champeau.gradle.jmh' version '0.4.5'
+    id 'me.champeau.gradle.jmh' version '0.4.3'
+    id 'io.morethan.jmhreport' version '0.7.0'
     id 'java'
 }
 
@@ -17,11 +18,26 @@ repositories {
 }
 
 dependencies {
+    jmh 'com.carrotsearch:hppc:0.7.3'
+    jmh 'it.unimi.dsi:fastutil:8.1.1'
+    jmh 'org.eclipse.collections:eclipse-collections:9.2.0.M1'
+    jmh 'org.agrona:agrona:0.9.15'
+    jmh 'org.apache.mahout:mahout-math:0.13.0'
+
     jmh "org.openjdk.jmh:jmh-core:$jmhVersion"
     jmh "org.openjdk.jmh:jmh-generator-annprocess:$jmhVersion"
 }
 
 jmh {
-    synchronizeIterations = true
+    include = ['.*collection.*Benchmark']
+    resultFormat = 'JSON'
+//    synchronizeIterations = true
     duplicateClassesStrategy = 'warn'
 }
+
+task deleteEmptyBmList(type: Delete) {
+    delete "$buildDir/jmh-generated-classes/META-INF/BenchmarkList"
+}
+jmhCompileGeneratedClasses.finalizedBy deleteEmptyBmList
+
+tasks.jmh.finalizedBy tasks.jmhReport

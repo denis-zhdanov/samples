@@ -1,0 +1,25 @@
+plugins {
+    id 'org.springframework.boot' version '2.0.5.RELEASE'
+    id 'java'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+group 'org.denis'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
+}
+
+bootJar {
+    mainClassName = 'org.denis.Start'
+    archiveName = 'myapp.jar'
+    launchScript()
+}

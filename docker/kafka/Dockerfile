@@ -4,4 +4,4 @@ COPY ./build/libs /opt/myapp/lib/
 
 WORKDIR /opt/myapp
 
-CMD ["java", "-jar", "/opt/myapp/lib/testcontainer-does-not-start.jar"]
+CMD ["java", "-jar", "/opt/myapp/lib/kafka-sample.jar"]

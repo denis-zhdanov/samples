@@ -2,5 +2,5 @@
 
 ./gradlew clean assemble
 docker build -t sample-kafka-client .
-docker-compose up
+docker-compose -f docker-compose-bitnami.yml up
 ./gradlew test -i

@@ -8,6 +8,6 @@ import org.springframework.core.io.support.PropertySourceFactory
 class YamlPropertySourceFactory : PropertySourceFactory {
 
     override fun createPropertySource(name: String?, resource: EncodedResource): PropertySource<*> {
-        return YamlPropertySourceLoader().load(name ?: resource.resource.description, resource.resource, null)
+        return YamlPropertySourceLoader().load(name ?: resource.resource.description, resource.resource).first()
     }
 }

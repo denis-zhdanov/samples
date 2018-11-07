@@ -1,7 +1,9 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.2.71'
-    id 'org.springframework.boot' version '1.5.10.RELEASE'
+    id 'org.springframework.boot' version '2.0.5.RELEASE'
 }
+
+apply plugin: 'io.spring.dependency-management'
 
 group 'org.denis'
 version '1.0-SNAPSHOT'
@@ -14,6 +16,7 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile 'org.jetbrains.kotlin:kotlin-reflect'
     compile 'org.springframework.boot:spring-boot-starter'
 }
 

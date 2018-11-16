@@ -2,4 +2,5 @@
 
 ./gradlew -x test build
 docker build -t myapp .
-./gradlew test
+./gradlew test &
+watch docker ps -a

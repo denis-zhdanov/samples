@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "924309288478",
+    "firebase_url": "https://familizer-bcc41.firebaseio.com",
+    "project_id": "familizer-bcc41",
+    "storage_bucket": "familizer-bcc41.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:924309288478:android:79c01d5f4a3cc551",
+        "android_client_info": {
+          "package_name": "harmonysoft.tech.notificationfirebaseexample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "924309288478-ta33r7fmn96871qdaau4q5n0177s65q5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAG2jOAhY3yhOu2AeinvsidVGt1wvv-IdE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:924309288478:android:9889987d1389a684",
+        "android_client_info": {
+          "package_name": "tech.harmonysoft.familizer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "924309288478-ta33r7fmn96871qdaau4q5n0177s65q5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAG2jOAhY3yhOu2AeinvsidVGt1wvv-IdE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

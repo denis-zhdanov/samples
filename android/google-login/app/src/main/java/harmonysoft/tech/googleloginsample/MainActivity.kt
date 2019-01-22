@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val button = findViewById<Button>(R.id.button)
-        val clientId = "290485944825-cg28gs7gbr97tfd5e09ughfqm0cogdma.apps.googleusercontent.com"
+        val clientId = "908734912557-qju23sussct1brar6rsqgr7bgn1qism4.apps.googleusercontent.com"
         button.setOnClickListener {
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()

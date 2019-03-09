@@ -1,6 +1,5 @@
 package org.denis.samples.mongo.graphLookup
 
-import com.mongodb.BasicDBObject
 import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.aggregation.Aggregation
@@ -8,7 +7,6 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation.match
 import org.springframework.data.mongodb.core.aggregation.GraphLookupOperation
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
-import org.springframework.data.mongodb.core.remove
 import org.springframework.stereotype.Component
 
 @Component

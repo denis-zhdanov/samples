@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+group 'org.denis'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.github.classgraph:classgraph:4.8.22'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.4.1'
+    testImplementation 'org.assertj:assertj-core:3.8.0'
+}

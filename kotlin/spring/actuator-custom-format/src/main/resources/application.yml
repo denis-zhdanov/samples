@@ -1,0 +1,10 @@
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: status
+      base-path: /
+server:
+  port: 8080

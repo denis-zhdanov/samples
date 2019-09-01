@@ -1,0 +1,8 @@
+server:
+  address: "common-server-address"
+  login: "common-server-login"
+  password: "common-server-password"
+database:
+  address: "common-db-address"
+  login: "common-db-login"
+  password: "common-db-password"

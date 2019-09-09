@@ -1,5 +1,5 @@
 environment:
-  server:
-    address: "APAC-server-address"
-    login: "APAC-server-login"
-    password: "APAC-server-password"
+  servers:
+    - address: "APAC-server-address"
+      login: "APAC-server-login"
+      password: "APAC-server-password"

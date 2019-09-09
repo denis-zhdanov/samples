@@ -1,0 +1,5 @@
+rootProject.name = 'config-server'
+
+include 'client'
+include 'server'
+

@@ -1,12 +1,2 @@
-environment:
-  servers:
-    - address: "common-server-address1"
-      login: "common-server-login1"
-      password: "common-server-password1"
-    - address: "common-server-address1"
-      login: "common-server-login1"
-      password: "common-server-password1"
-  database:
-    address: "common-db-address"
-    login: "common-db-login"
-    password: "common-db-password"
+servers:
+  address: "my-server-address"

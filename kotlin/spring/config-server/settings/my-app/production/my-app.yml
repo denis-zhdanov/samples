@@ -1,2 +1,3 @@
 servers:
-  address: "my-server-address"
+  - address: "my-server-address"
+  - address: "my-server-address2"

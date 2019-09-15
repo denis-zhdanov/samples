@@ -3,7 +3,6 @@ package org.denis.samples.spring.lib.impl
 import org.denis.samples.spring.lib.Context
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
-import kotlin.system.measureTimeMillis
 
 class ContextBuilderImpl(private val dataProvider: (String) -> Any?) : Context.Builder {
 
@@ -13,7 +12,7 @@ class ContextBuilderImpl(private val dataProvider: (String) -> Any?) : Context.B
     private var collectionCreator = wrapCollectionCreator(DEFAULT_COLLECTION_CREATOR)
     private var regularPropertyNameStrategy = DEFAULT_REGULAR_PROPERTY_NAME_STRATEGY
     private var collectionPropertyNameStrategy = DEFAULT_COLLECTION_ELEMENT_PROPERTY_NAME_STRATEGY
-    private var typeConverter = DEFAULT_TYPE_CONVERTER
+    private var typeConverter = wrapTypeConverter(DEFAULT_TYPE_CONVERTER)
 
     override fun withSimpleTypes(types: Set<KClass<*>>, replace: Boolean): Context.Builder {
         return apply {
@@ -33,9 +32,28 @@ class ContextBuilderImpl(private val dataProvider: (String) -> Any?) : Context.B
         }
     }
 
-    override fun withTypeConverter(converter: (Any, KClass<*>) -> Any): Context.Builder {
+    override fun withTypeConverter(replace: Boolean, converter: (Any, KClass<*>) -> Any?): Context.Builder {
         return apply {
-            typeConverter = converter
+            typeConverter = wrapTypeConverter(if (replace) {
+                converter
+            } else {
+                { value, targetType ->
+                    DEFAULT_TYPE_CONVERTER(value, targetType) ?: converter(value, targetType)
+                }
+            })
+        }
+    }
+
+    private fun wrapTypeConverter(converter: (Any, KClass<*>) -> Any?): (Any, KClass<*>) -> Any {
+        return { value, targetType ->
+            converter(value, targetType) ?: if (targetType.isInstance(value)) {
+                value
+            } else {
+                throw IllegalArgumentException(
+                        "can't convert value '$value' of type '${value::class.qualifiedName}' "
+                        + "to type '${targetType.qualifiedName}'"
+                )
+            }
         }
     }
 
@@ -46,8 +64,8 @@ class ContextBuilderImpl(private val dataProvider: (String) -> Any?) : Context.B
     }
 
     override fun withCollectionCreator(
-            creator: (KClass<*>) -> MutableCollection<Any>?,
-            replace: Boolean
+            replace: Boolean,
+            creator: (KClass<*>) -> MutableCollection<Any>?
     ): Context.Builder {
         return apply {
             collectionCreator = if (replace) {
@@ -118,7 +136,7 @@ class ContextBuilderImpl(private val dataProvider: (String) -> Any?) : Context.B
             }
         }
 
-        val DEFAULT_TYPE_CONVERTER: (Any, KClass<*>) -> Any = { rawValue, targetClass ->
+        val DEFAULT_TYPE_CONVERTER: (Any, KClass<*>) -> Any? = { rawValue, targetClass ->
             if (targetClass.isInstance(rawValue)) {
                 rawValue
             } else {
@@ -145,10 +163,7 @@ class ContextBuilderImpl(private val dataProvider: (String) -> Any?) : Context.B
                     Long::class -> trimmedValue.toLong()
                     Float::class -> trimmedValue.toFloat()
                     Double::class -> trimmedValue.toDouble()
-                    else -> throw IllegalArgumentException(
-                            "can't convert value '$trimmedValue' of type '${trimmedValue::class.qualifiedName}' "
-                            + "to type '${targetClass.qualifiedName}'"
-                    )
+                    else -> null
                 }
             }
         }

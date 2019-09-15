@@ -86,7 +86,7 @@ class ParameterValueRetriever(val parameter: KParameter) {
         var i = 0
         val parameters = context.createCollection(collectionClass)
         while (true) {
-            val collectionElementPropertyName = "$propertyName[$i]"
+            val collectionElementPropertyName = context.getCollectionElementPropertyName(propertyName, i)
             i++
             if (context.isSimpleType(typeClass)) {
                 val rawValue = context.getPropertyValue(collectionElementPropertyName) ?: break

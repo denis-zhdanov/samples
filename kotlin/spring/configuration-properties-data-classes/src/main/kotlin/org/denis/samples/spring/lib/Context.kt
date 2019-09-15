@@ -114,8 +114,12 @@ interface Context {
          * Strategy for converting 'raw values' to the target type, e.g. `String` to `Int`.
          *
          * [ContextBuilderImpl.DEFAULT_TYPE_CONVERTER] is used by default.
+         *
+         * @param replace       defines whether given converter should be used as a complement to the
+         *                      built-in converter or should completely replace it
+         * @param converter     converter to use
          */
-        fun withTypeConverter(converter: (Any, KClass<*>) -> Any): Builder
+        fun withTypeConverter(replace: Boolean = false, converter: (Any, KClass<*>) -> Any?): Builder
 
         /**
          * Strategy for building 'regular property' names (as opposed to
@@ -140,14 +144,14 @@ interface Context {
          *
          * [ContextBuilderImpl.DEFAULT_COLLECTION_CREATOR] is used by default.
          *
-         * @param creator       the actual strategy; returns `null` as an indication that it doesn't know how to
-         *                      create a collection of the target type
          * @param replace       defines if given strategy should be used only if default strategy fails creating
          *                      a collection of the target type
+         * @param creator       the actual strategy; returns `null` as an indication that it doesn't know how to
+         *                      create a collection of the target type
          */
         fun withCollectionCreator(
-                creator: (KClass<*>) -> MutableCollection<Any>?,
-                replace: Boolean = false
+                replace: Boolean = false,
+                creator: (KClass<*>) -> MutableCollection<Any>?
         ): Builder
 
         /**

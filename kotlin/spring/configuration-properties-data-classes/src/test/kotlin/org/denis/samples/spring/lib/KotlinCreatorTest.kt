@@ -6,8 +6,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.lang.IllegalArgumentException
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.LinkedBlockingQueue
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createType
+import kotlin.reflect.full.isSuperclassOf
 
 internal class KotlinCreatorTest {
 
@@ -253,6 +256,88 @@ internal class KotlinCreatorTest {
                 SimpleTypeListHolder(listOf(1, 2)),
                 SimpleTypeListHolder(listOf(3))
         )))
+    }
+
+    @Test
+    fun `when custom property name strategy is defined then it's respected`() {
+        val input = mapOf(
+                "prop[0]-value" to '1',
+                "prop[1]-value" to "2"
+        )
+        val context = Context.builder {
+            input[it]
+        }.withRegularPropertyNameStrategy { base, propertyName ->
+            if (base.isBlank()) {
+                propertyName
+            } else {
+                "$base-$propertyName"
+            }
+        }.build()
+        val actual = creator.create<NonSimpleTypeListHolder>(
+                "", NonSimpleTypeListHolder::class.createType(), context
+        )
+        assertThat(actual).isEqualTo(NonSimpleTypeListHolder(listOf(
+                ListElement(1), ListElement(2)
+        )))
+    }
+
+    @Test
+    fun `when custom simple type is defined then it's respected`() {
+        data class Element(val value: Int)
+        data class Composite(val first: Element, val second: Element)
+        val input = mapOf(
+                "first" to "1",
+                "second" to "2"
+        )
+        val context = Context.builder {
+            input[it]
+        }.withTypeConverter { value, targetType ->
+            if (targetType == Element::class) {
+                Element(value.toString().toInt())
+            } else {
+                null
+            }
+        }.withSimpleTypes(setOf(Element::class)).build()
+
+        val actual = creator.create<Composite>("", Composite::class.createType(), context)
+        assertThat(actual).isEqualTo(Composite(Element(1), Element(2)))
+    }
+
+    @Test
+    fun `when custom collection type is defined then it's respected`() {
+        data class Target(val queue: BlockingQueue<Int>)
+        val input = mapOf(
+                "queue[0]" to "1",
+                "queue[1]" to "2"
+        )
+        val context = Context.builder {
+            input[it]
+        }.withCollectionCreator { collectionClass ->
+            if (BlockingQueue::class.isSuperclassOf(collectionClass)) {
+                LinkedBlockingQueue()
+            } else {
+                null
+            }
+        }.withCollectionTypes(setOf(BlockingQueue::class)).build()
+
+        val actual = creator.create<Target>("", Target::class.createType(), context)
+        assertThat(actual.queue).containsOnly(1, 2)
+    }
+
+    @Test
+    fun `when custom collection property name strategy is defined then it's respected`() {
+        val input = mapOf(
+                "prop<1>.value" to "1",
+                "prop<2>.value" to "2"
+        )
+        val context = Context
+                .builder { input[it] }
+                .withCollectionElementPropertyNameStrategy { base, index ->  "$base<${index + 1}>"}
+                .build()
+        val actual = creator.create<NonSimpleTypeListHolder>(
+                "", NonSimpleTypeListHolder::class.createType(), context
+        )
+        assertThat(actual).isEqualTo(NonSimpleTypeListHolder(listOf(ListElement(1), ListElement(2))))
     }
 
     private fun <T : Any> doCreate(klass: KClass<T>, data: Map<String, Any>): T {

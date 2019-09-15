@@ -2,6 +2,7 @@ package org.denis.samples.spring.lib.impl
 
 import org.denis.samples.spring.lib.Context
 import kotlin.reflect.KClass
+import kotlin.reflect.KType
 import kotlin.reflect.full.isSuperclassOf
 
 class ContextBuilderImpl(private val dataProvider: (String) -> Any?) : Context.Builder {
@@ -13,6 +14,9 @@ class ContextBuilderImpl(private val dataProvider: (String) -> Any?) : Context.B
     private var regularPropertyNameStrategy = DEFAULT_REGULAR_PROPERTY_NAME_STRATEGY
     private var collectionPropertyNameStrategy = DEFAULT_COLLECTION_ELEMENT_PROPERTY_NAME_STRATEGY
     private var typeConverter = wrapTypeConverter(DEFAULT_TYPE_CONVERTER)
+    private var mapCreator: () -> MutableMap<Any, Any> = DEFAULT_MAP_CREATOR
+    private var mapKeyStrategy: (KType) -> Iterable<String> = DEFAULT_MAP_KEY_STRATEGY
+    private var mapValuePropertyNameStrategy = DEFAULT_REGULAR_PROPERTY_NAME_STRATEGY
 
     override fun withSimpleTypes(types: Set<KClass<*>>, replace: Boolean): Context.Builder {
         return apply {
@@ -94,6 +98,24 @@ class ContextBuilderImpl(private val dataProvider: (String) -> Any?) : Context.B
         }
     }
 
+    override fun withMapCreator(creator: () -> MutableMap<Any, Any>): Context.Builder {
+        return apply {
+            mapCreator = creator
+        }
+    }
+
+    override fun withMapKeyStrategy(strategy: (KType) -> Iterable<String>): Context.Builder {
+        return apply {
+            mapKeyStrategy = strategy
+        }
+    }
+
+    override fun withMapValuePropertyNameStrategy(strategy: (String, String) -> String): Context.Builder {
+        return apply {
+            mapValuePropertyNameStrategy = strategy
+        }
+    }
+
     override fun build(): Context {
         return ContextImpl(
                 dataProvider = dataProvider,
@@ -102,7 +124,10 @@ class ContextBuilderImpl(private val dataProvider: (String) -> Any?) : Context.B
                 collectionCreator = collectionCreator,
                 collectionPropertyNameStrategy = collectionPropertyNameStrategy,
                 simpleTypes = simpleTypes,
-                collectionTypes = collectionTypes
+                collectionTypes = collectionTypes,
+                mapCreator = mapCreator,
+                mapKeyStrategy = mapKeyStrategy,
+                mapPropertyNameStrategy = mapValuePropertyNameStrategy
         )
     }
 
@@ -166,6 +191,14 @@ class ContextBuilderImpl(private val dataProvider: (String) -> Any?) : Context.B
                     else -> null
                 }
             }
+        }
+
+        val DEFAULT_MAP_CREATOR: () -> MutableMap<Any, Any> = {
+            mutableMapOf()
+        }
+
+        val DEFAULT_MAP_KEY_STRATEGY: (KType) -> Iterable<String> = {
+            emptyList()
         }
     }
 }

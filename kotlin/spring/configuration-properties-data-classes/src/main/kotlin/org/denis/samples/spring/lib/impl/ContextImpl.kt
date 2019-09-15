@@ -3,6 +3,7 @@ package org.denis.samples.spring.lib.impl
 import org.denis.samples.spring.lib.Context
 import java.util.*
 import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 class ContextImpl(
         private val dataProvider: (String) -> Any?,
@@ -11,7 +12,10 @@ class ContextImpl(
         private val collectionCreator: (KClass<*>) -> MutableCollection<Any>,
         private val collectionPropertyNameStrategy: (String, Int) -> String,
         private val simpleTypes: Set<KClass<*>>,
-        private val collectionTypes: Set<KClass<*>>
+        private val collectionTypes: Set<KClass<*>>,
+        private val mapCreator: () -> MutableMap<Any, Any>,
+        private val mapKeyStrategy: (KType) -> Iterable<String>,
+        private val mapPropertyNameStrategy: (String, String) -> String
 ) : Context {
 
     private val _tolerateEmptyCollection = ThreadLocal.withInitial { Stack<Boolean>().apply { push(true) } }
@@ -56,5 +60,17 @@ class ContextImpl(
 
     override fun getPropertyValue(propertyName: String): Any? {
         return dataProvider(propertyName)
+    }
+
+    override fun getMapKeys(keyType: KType): Iterable<String> {
+        return mapKeyStrategy(keyType)
+    }
+
+    override fun createMap(): MutableMap<Any, Any> {
+        return mapCreator()
+    }
+
+    override fun getMapValuePropertyName(base: String, key: String): String {
+        return mapPropertyNameStrategy(base, key)
     }
 }

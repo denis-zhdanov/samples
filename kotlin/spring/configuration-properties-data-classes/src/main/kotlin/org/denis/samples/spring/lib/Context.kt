@@ -2,6 +2,7 @@ package org.denis.samples.spring.lib
 
 import kotlin.reflect.KClass
 import org.denis.samples.spring.lib.impl.ContextBuilderImpl
+import kotlin.reflect.KType
 
 interface Context {
 
@@ -91,6 +92,27 @@ interface Context {
      */
     fun createCollection(klass: KClass<*>): MutableCollection<Any>
 
+    /**
+     * It's not possible to automatically deduce target keys for `Map` parameter
+     * (e.g. `data class MyClass(val prop: Map<String, Int>)`. Hence, the only way is to configure predefined
+     * keys in context and try all of them during instantiation.
+     *
+     * This method exposes keys configured for the target type (if any).
+     */
+    fun getMapKeys(keyType: KType): Iterable<String>
+
+    /**
+     * A strategy for building map value property names, e.g. if we have a declaration like
+     * `data class MyClass(val prop: Map<String, Int>)` and want to check if there is a value for key `ONE`,
+     * then we call this method and it might return property name `prop.ONE`.
+     */
+    fun getMapValuePropertyName(base: String, key: String): String
+
+    /**
+     * Creates mutable map to use for a map property.
+     */
+    fun createMap(): MutableMap<Any, Any>
+
     companion object {
 
         fun builder(dataProvider: (String) -> Any?): Builder {
@@ -160,6 +182,27 @@ interface Context {
          * [ContextBuilderImpl.DEFAULT_COLLECTION_ELEMENT_PROPERTY_NAME_STRATEGY] is used by default.
          */
         fun withCollectionElementPropertyNameStrategy(strategy: (String, Int) -> String): Builder
+
+        /**
+         * Strategy for map property creator.
+         *
+         * [ContextBuilderImpl.DEFAULT_MAP_CREATOR] is used by default.
+         */
+        fun withMapCreator(creator: () -> MutableMap<Any, Any>): Builder
+
+        /**
+         * Strategy for keys to try for the target key type (see [Context.getMapKeys]).
+         *
+         * [ContextBuilderImpl.DEFAULT_MAP_KEY_STRATEGY] is used by default.
+         */
+        fun withMapKeyStrategy(strategy: (KType) -> Iterable<String>): Builder
+
+        /**
+         * Strategy for map value property name strategy (see [Context.getMapValuePropertyName]).
+         *
+         * [ContextBuilderImpl.DEFAULT_REGULAR_PROPERTY_NAME_STRATEGY] is used by default.
+         */
+        fun withMapValuePropertyNameStrategy(strategy: (String, String) -> String): Builder
 
         fun build(): Context
     }

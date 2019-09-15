@@ -1,8 +1,10 @@
 package org.denis.samples.spring.lib.impl
 
-import org.denis.samples.spring.lib.*
+import org.denis.samples.spring.lib.Context
+import org.denis.samples.spring.lib.KotlinCreator
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
+import kotlin.reflect.full.isSuperclassOf
 
 class ParameterValueRetriever(val parameter: KParameter) {
 
@@ -40,6 +42,10 @@ class ParameterValueRetriever(val parameter: KParameter) {
 
         if (context.isCollection(klass)) {
             return retrieveCollection(klass, propertyName, creator, context)
+        }
+
+        if (Map::class.isSuperclassOf(klass)) {
+            return retrieveMap(propertyName, creator, context)
         }
 
         return Result.success(creator.create(propertyName, parameter.type, context))
@@ -117,6 +123,43 @@ class ParameterValueRetriever(val parameter: KParameter) {
         } else {
             Result.success(parameters)
         }
+    }
+
+    private fun retrieveMap(
+            propertyName: String,
+            creator: KotlinCreator,
+            context: Context
+    ): Result<Any?, String>? {
+        val keyType = parameter.type.arguments[0].type ?: throw IllegalArgumentException(
+                "Failed instantiating a Map property '$propertyName' - no key type info is available for $parameter"
+        )
+        val keyClass = keyType.classifier as? KClass<*> ?: throw IllegalArgumentException(
+                "Failed instantiating a Map property '$propertyName' - can't derive key class for $parameter"
+        )
+        val valueType = parameter.type.arguments[1].type ?: throw IllegalArgumentException(
+                "Failed instantiating a Map property '$propertyName' - no value type info is available for $parameter"
+        )
+        val valueClass = valueType.classifier as? KClass<*> ?: throw IllegalArgumentException(
+                "Failed instantiating a Map property '$propertyName' - can't derive value class for $parameter"
+        )
+        val map = context.createMap()
+        for (key in context.getMapKeys(keyType)) {
+            val valuePropertyName = context.getMapValuePropertyName(propertyName, key)
+            if (context.isSimpleType(valueClass)) {
+                val rawValue = context.getPropertyValue(valuePropertyName)
+                if (rawValue != null) {
+                    val convertedValue = context.convertIfNecessary(rawValue, valueClass)
+                    map[context.convertIfNecessary(key, keyClass)] = convertedValue
+                }
+            } else {
+                try {
+                    val value = creator.create<Any>(valuePropertyName, valueType, context)
+                    map[context.convertIfNecessary(key, keyClass)] = value
+                } catch (ignore: Exception) {
+                }
+            }
+        }
+        return Result.success(map)
     }
 
     override fun toString(): String {

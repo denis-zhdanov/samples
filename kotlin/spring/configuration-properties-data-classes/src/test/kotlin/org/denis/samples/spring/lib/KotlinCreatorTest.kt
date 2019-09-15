@@ -2,10 +2,11 @@ package org.denis.samples.spring.lib
 
 import org.assertj.core.api.Assertions.assertThat
 import org.denis.samples.spring.lib.impl.CacheAwareCreator
+import org.denis.samples.spring.lib.impl.enumConverter
+import org.denis.samples.spring.lib.impl.enumKeyProducer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.lang.IllegalArgumentException
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import kotlin.reflect.KClass
@@ -340,12 +341,33 @@ internal class KotlinCreatorTest {
         assertThat(actual).isEqualTo(NonSimpleTypeListHolder(listOf(ListElement(1), ListElement(2))))
     }
 
+    @Test
+    fun `when map property is declared then it's correctly populated`() {
+        val input = mapOf(
+                "prop.FIRST.prop.SECOND" to "1",
+                "prop.SECOND.prop.FIRST" to "2",
+                "prop.SECOND.prop.SECOND" to "3"
+        )
+        val context = Context
+                .builder { input[it] }
+                .withTypeConverter(false, enumConverter<Key>(enumValues<Key>()))
+                .withMapKeyStrategy(enumKeyProducer<Key>())
+                .build()
+        val actual = creator.create<Any>("", CompositeMapHolder::class.createType(), context)
+        assertThat(actual).isEqualTo(CompositeMapHolder(mapOf(
+                Key.FIRST to MapHolder(mapOf(Key.SECOND to 1)),
+                Key.SECOND to MapHolder(mapOf(Key.FIRST to 2, Key.SECOND to 3))
+        )))
+    }
+
     private fun <T : Any> doCreate(klass: KClass<T>, data: Map<String, Any>): T {
         return creator.create("", klass.createType(), Context.builder { data[it] }.build())
     }
 
     // We define this classes not in corresponding methods because of https://youtrack.jetbrains.com/issue/KT-10397
     // - getting an exception during test execution otherwise
+
+    enum class Key { FIRST, SECOND }
 
     data class ListElement(val value: Int)
 
@@ -356,4 +378,8 @@ internal class KotlinCreatorTest {
     data class SimpleTypeListHolder(val prop: List<Int>)
 
     data class CompositeSimpleListHolder(val prop: List<SimpleTypeListHolder>)
+
+    data class MapHolder(val prop: Map<Key, Int>)
+
+    data class CompositeMapHolder(val prop: Map<Key, MapHolder>)
 }

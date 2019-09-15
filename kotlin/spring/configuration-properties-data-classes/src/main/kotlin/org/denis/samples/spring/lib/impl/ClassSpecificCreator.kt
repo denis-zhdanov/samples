@@ -15,11 +15,11 @@ class ClassSpecificCreator<T : Any>(private val type: KType) {
     fun create(prefix: String, creator: KotlinCreator, context: Context): T {
         val failedResults = mutableMapOf<Instantiator<T>, String>()
         val result = instantiators.mapFirstNotNull {
-            val result = it.mayBeCreate(prefix, creator, context)
-            if (result.success) {
-                result.successValue
+            val candidate = it.mayBeCreate(prefix, creator, context)
+            if (candidate.success) {
+                candidate.successValue
             } else {
-                failedResults[it] = result.failureValue
+                failedResults[it] = candidate.failureValue
                 null
             }
         } ?: throw IllegalArgumentException(
